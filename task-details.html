@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Task Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title" id="taskName"></h5>
+            </div>
+            <div class="card-body">
+                <form id="editTaskForm">
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="taskDescription"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="dueDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status">
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = urlParams.get('id');
+
+        function getTask(taskId) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            return tasks.find(task => task.id === taskId);
+        }
+
+        function loadTaskDetails(taskId) {
+            const task = getTask(taskId);
+            if (task) {
+                document.getElementById('taskName').textContent = task.name;
+                document.getElementById('taskDescription').value = task.description;
+                document.getElementById('dueDate').value = task.dueDate;
+                document.getElementById('priority').value = task.priority;
+                document.getElementById('status').value = task.status;
+            } else {
+                // Handle case where task is not found
+                document.getElementById('taskName').textContent = "Task Not Found";
+                document.getElementById('editTaskForm').style.display = 'none'; 
+            }
+        }
+
+        loadTaskDetails(taskId);
+
+        document.getElementById('editTaskForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const updatedTask = {
+                id: taskId,
+                name: document.getElementById('taskName').textContent,
+                description: document.getElementById('taskDescription').value,
+                dueDate: document.getElementById('dueDate').value,
+                priority: document.getElementById('priority').value,
+                status: document.getElementById('status').value
+            };
+
+            updateTask(updatedTask);
+        });
+
+        function updateTask(updatedTask) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskIndex = tasks.findIndex(task => task.id === updatedTask.id);
+
+            if (taskIndex !== -1) {
+                tasks[taskIndex] = updatedTask;
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                alert('Task updated successfully!');
+            } else {
+                alert('Task not found.');
+            }
+        }
+    </script>
+</body>
+</html>
